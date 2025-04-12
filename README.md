@@ -12,7 +12,7 @@ The code in this repo requires a CUDA-capable GPU which can perform operations a
 pip install jet-pytorch
 ```
 
-The models from the original paper/this reproduction are trained using downsampled imagenet which is availabe from a few different sources, including [Kaggle](https://www.kaggle.com/datasets/ayaroshevskiy/downsampled-imagenet-64x64). The `ImageDataset` provided in this repository does not load/support labels and does not require any specific directory structure.
+The models from the original paper/this reproduction are trained using downsampled imagenet which is available from a few different sources, including [Kaggle](https://www.kaggle.com/datasets/ayaroshevskiy/downsampled-imagenet-64x64). The `ImageDataset` provided in this repository does not load/support labels and does not require any specific directory structure.
 
 ## Usage
 ```py
