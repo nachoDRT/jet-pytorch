@@ -23,6 +23,7 @@ RUN pip check
 
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python
 
+ENV WANDB_API_KEY=<your_token>
 
 COPY . .
 

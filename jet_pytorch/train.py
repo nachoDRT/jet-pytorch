@@ -7,6 +7,7 @@ from torch.nn.utils import clip_grad_norm_
 from torch.utils.data import DataLoader
 from torchvision.transforms import v2
 from tqdm import tqdm
+import wandb
 
 from jet_pytorch import Jet
 from jet_pytorch.util import bits_per_dim
@@ -121,6 +122,14 @@ def train(
                     gn=gn,
                     lr=lr,
                 ))
+                wandb.log({
+                    "train/bpd": log_bpd,
+                    "train/nll": log_nll,
+                    "train/logdet": log_logdet,
+                    "train/grad_norm": gn,
+                    "train/lr": lr,
+                    "epoch": epoch,
+                })
                 steps = 0
                 log_bpd = 0.0
                 log_nll = 0.0
@@ -159,6 +168,12 @@ def train(
         val_nll /= len(val_dataloader)
         val_logdet /= len(val_dataloader)
         print(f"validation metrics - bpd: {val_bpd:.2f}, nll: {val_nll:.2f}, logdet: {val_logdet:.2f}")
+        wandb.log({
+            "val/bpd": val_bpd,
+            "val/nll": val_nll,
+            "val/logdet": val_logdet,
+            "epoch": epoch,
+        })
         model.train()
 
 

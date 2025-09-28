@@ -1,6 +1,7 @@
 import torchvision.io
 from torchvision.io import read_image as original_read_image
 
+# TODO Fix this properly
 def safe_read_image(path):
     return original_read_image(str(path))
 
@@ -13,9 +14,10 @@ import os
 from tqdm import tqdm
 from jet_pytorch.train import train
 from datasets import load_dataset
+import wandb
 
 
-def save_hf_dataset_to_disk(hf_dataset, output_dir, percentage=0.1):
+def save_hf_dataset_to_disk(hf_dataset, output_dir, percentage=0.01):
     os.makedirs(output_dir, exist_ok=True)
     subset = hf_dataset.select(range(int(len(hf_dataset) * percentage)))
     for i, sample in tqdm(enumerate(subset), total=len(subset)):    
@@ -32,6 +34,23 @@ def get_hf_dataset():
 
 
 def train_jet():
+
+    wandb.login(key=os.getenv("WANDB_API_KEY"))
+    wandb.init(
+        project=wandb_project,
+        name=wandb_run_name,
+        entity=wandb_entity,
+        config={
+            "batch_size": 64,
+            "accumulate_steps": 16,
+            "epochs": 50,
+            "learning_rate": 3e-4,
+            "patch_size": 4,
+            "patch_dim": 48,
+            "n_patches": 256,
+            "coupling_layers": 32,
+        },
+    )
 
     jet_config = dict(
         patch_size=4,
@@ -77,9 +96,15 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_name", type=str)
+    parser.add_argument("--wandb_entity", type=str)
+    parser.add_argument("--wandb_project", type=str)
+    parser.add_argument("--wandb_run_name", type=str)
     args = parser.parse_args()
 
     dataset_name = args.dataset_name
+    wandb_entity = args.wandb_entity
+    wandb_project = args.wandb_project
+    wandb_run_name = args.wandb_run_name
 
     get_hf_dataset()
     train_jet()
