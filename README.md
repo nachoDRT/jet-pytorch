@@ -109,3 +109,19 @@ sample(
 )
 ```
 Visualization results are stored at `output/jet.png`
+
+### Run docker
+
+Execute from ./jet-pytorch/
+
+Available cards: `RTX4090`
+
+#### Create the docker
+```bash
+docker build -f dockerfiles/your_card/Dockerfile -t jet .
+```
+
+#### Run the docker
+```bash
+docker run -it --gpus '"device=0"' -v $(pwd)/output:/app/output --ipc=host jet
+```
