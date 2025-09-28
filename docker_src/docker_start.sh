@@ -6,4 +6,5 @@ python docker_src/docker_train.py \
     --dataset_name "ylecun/mnist" \
     --wandb_entity "ciclab-comillas" \
     --wandb_project "jet" \
-    --wandb_run_name "mnist"
+    --wandb_run_name "mnist" \
+    --hf_repo_id "your_hf_repo"

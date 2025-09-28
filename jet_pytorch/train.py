@@ -8,6 +8,8 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import v2
 from tqdm import tqdm
 import wandb
+from huggingface_hub import upload_file
+from safetensors.torch import save_file
 
 from jet_pytorch import Jet
 from jet_pytorch.util import bits_per_dim
@@ -31,6 +33,7 @@ def train(
     num_workers=16,
     device="cuda:0",
     checkpoint_path="jet_imagenet.pt",
+    hf_repo_id = None
 ):
     t.set_float32_matmul_precision("medium")
 
@@ -87,6 +90,8 @@ def train(
     log_bpd = 0.0
     log_nll = 0.0
     log_logdet = 0.0
+
+    best_val_loss = float("inf")
 
     for epoch in range(epochs):
         pbar = tqdm(dataloader, total=len(dataloader) // accumulate_steps)
@@ -174,6 +179,22 @@ def train(
             "val/logdet": val_logdet,
             "epoch": epoch,
         })
+
+        # Save model if it's the best so far
+        if val_bpd < best_val_loss:
+            print(f"New best validation loss: {val_bpd:.4f} (prev {best_val_loss:.4f})")
+            best_val_loss = val_bpd
+
+            state_dict = orig_model.state_dict()
+            save_file(state_dict, "jet_mnist.safetensors")
+
+            upload_file(
+                path_or_fileobj="jet_mnist.safetensors",
+                path_in_repo="jet_mnist.safetensors",
+                repo_id=hf_repo_id,
+                repo_type="model"
+            )
+
         model.train()
 
 

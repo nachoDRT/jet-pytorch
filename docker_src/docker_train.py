@@ -15,6 +15,7 @@ from tqdm import tqdm
 from jet_pytorch.train import train
 from datasets import load_dataset
 import wandb
+from huggingface_hub import login
 
 
 def save_hf_dataset_to_disk(hf_dataset, output_dir, percentage=0.01):
@@ -52,6 +53,8 @@ def train_jet():
         },
     )
 
+    login(token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
+
     jet_config = dict(
         patch_size=4,
         patch_dim=48,
@@ -79,7 +82,7 @@ def train_jet():
         batch_size=32,
         accumulate_steps=16,
         device="cuda:0",
-        epochs=50,
+        epochs=250,
         warmup_percentage=0.1,
         max_grad_norm=1.0,
         learning_rate=3e-4,
@@ -89,6 +92,7 @@ def train_jet():
         images_path_valid= f"./{dataset_name}_valid",
         num_workers=8,
         checkpoint_path="jet.pt",
+        hf_repo_id=hf_repo_id
     )
 
 
@@ -99,12 +103,14 @@ if __name__ == "__main__":
     parser.add_argument("--wandb_entity", type=str)
     parser.add_argument("--wandb_project", type=str)
     parser.add_argument("--wandb_run_name", type=str)
+    parser.add_argument("--hf_repo_id", type=str, default=None)
     args = parser.parse_args()
 
     dataset_name = args.dataset_name
     wandb_entity = args.wandb_entity
     wandb_project = args.wandb_project
     wandb_run_name = args.wandb_run_name
+    hf_repo_id = args.hf_repo_id
 
     get_hf_dataset()
     train_jet()
