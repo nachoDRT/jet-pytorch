@@ -12,16 +12,20 @@ from torch.utils.data import Dataset
 from torchvision.io import read_image
 
 
-def get_pretrained():
-    pretrained_path = "models/jet_imagenet64x64_200m/jet_imagenet64x64_200m.safetensors"
+def get_pretrained(repo_id: str = None, model_name:str = None):
+    if model_name is None:
+        pretrained_path = "models/jet_imagenet64x64_200m/jet_imagenet64x64_200m.safetensors"
+    else:
+        pretrained_path = f"models/{model_name}/{model_name}.safetensors"
     os.makedirs("models", exist_ok=True)
 
     if not os.path.exists(pretrained_path):
         _ = hf_hub_download(
-            repo_id="btrude/jet_imagenet64x64_200m",
-            filename="jet_imagenet64x64_200m.safetensors",
-            local_dir="models/jet_imagenet64x64_200m",
+            repo_id=repo_id,
+            filename=f"{model_name}.safetensors",
+            local_dir=f"models/{model_name}",
         )
+
     return load_file(pretrained_path)
 
 
